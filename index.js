@@ -9,6 +9,8 @@ app.get('/', (req, res) => {
   res.json({ message: 'API de triagem funcionando!' });
 });
 
+
+
 app.get('/db-check', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
@@ -25,7 +27,8 @@ app.post('/classify', async (req, res) => {
     const resultObject = JSON.parse(result);
     res.json( resultObject );
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Não foi possível processar a classificação. Tente novamente" });
   }
 });
 
