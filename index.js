@@ -11,25 +11,29 @@ app.get('/', (req, res) => {
 
 
 
-app.get('/db-check', async (req, res) => {
+app.get('/db-check', async (req, res, next) => {
   try {
     const result = await pool.query('SELECT NOW()');
     res.json({ status: 'Conectado ao banco!', timestamp: result.rows[0].now });
   } catch (err) {
-    res.status(500).json({ status: 'Erro na conexão', error: err.message });
+    next(err);
   }
 });
 
-app.post('/classify', async (req, res) => {
+app.post('/classify', async (req, res, next) => {
   try {
     const { ticketText } = req.body;
     const result = await classifyTicket(ticketText);
     const resultObject = JSON.parse(result);
     res.json( resultObject );
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Não foi possível processar a classificação. Tente novamente" });
+    next(err);
   }
+});
+
+app.use((err, req, res, next) => {
+  console.error(err); // loga o erro completo no servidor
+  res.status(500).json({ message: "Erro ao processar a requisição" });
 });
 
 app.listen(PORT, () => {
