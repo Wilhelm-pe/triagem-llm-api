@@ -36,6 +36,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Erro ao processar a requisição" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+}
+
+module.exports = app;
