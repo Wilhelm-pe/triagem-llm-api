@@ -21,16 +21,22 @@ test('servidor ativo /db_check', async() => {
 });
 
 test('Testando classificação do ticket', async () => {
-    // PASSO 1: configura o mock ANTES de tudo
     classifyTicket.mockResolvedValue('{"categoria": "bug", "urgencia": "alta"}');
-
-    // PASSO 2: dispara a requisição com await, e manda o corpo com .send()
     const resultApi = await supertest(app).post('/classify').send({ ticketText: "teste" });
-
-    // PASSO 3: confere o resultado
     expect(resultApi.body.categoria).toBe("bug");
 });
 
+test('Testando erro na API', async () => {
+    // PASSO 1: configura o mock para REJEITAR (não resolver)
+    classifyTicket.mockRejectedValue(new Error("Erro ao processar a requisição"));
+
+    // PASSO 2: dispara a requisição
+    const resultApi = await supertest(app).post('/classify').send({ ticketText: "teste" });
+
+    // PASSO 3: confere o status e a mensagem de erro
+    expect(resultApi.status).toBe(500);
+    expect(resultApi.body.message).toBe("Erro ao processar a requisição");
+});
 afterAll(async () => {
     await pool.end()
 });
