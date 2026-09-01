@@ -22,8 +22,18 @@ test('servidor ativo /db_check', async() => {
 
 test('Testando classificação do ticket', async () => {
     classifyTicket.mockResolvedValue('{"categoria": "bug", "urgencia": "alta"}');
-    const resultApi = await supertest(app).post('/classify').send({ ticketText: "teste" });
+    const resultApi = await supertest(app).post('/classify').send({ ticketText: "teste"});
+    
     expect(resultApi.body.categoria).toBe("bug");
+});
+
+
+test('Testando valor vazio para ticket', async () => {
+    
+    const resultApi = await supertest(app).post('/classify').send({ ticketText: ""});
+    expect(resultApi.status).toBe(400);
+    
+    
 });
 
 test('Testando erro na API', async () => {
